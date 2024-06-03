@@ -2,7 +2,7 @@ const  express = require('express')
 const app = express();
 const cors=require('cors');
 require('dotenv').config();
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 //middlewares 
@@ -29,6 +29,7 @@ async function run() {
     const database = client.db('lifeOn');
     const videosCollaction = database.collection('videos');
     const packagesCollaction = database.collection('packages');
+    const ourPackagesCollaction = database.collection('ourPackages');
     // videos api
     app.get('/videos',async(req,res)=>{
         const result= await videosCollaction.find().toArray();
@@ -39,6 +40,20 @@ async function run() {
         const result=await packagesCollaction.find().toArray();
         res.send(result);
     })
+    // our all packages
+    app.get("/ourPackages",async(req,res)=>{
+      const result=await ourPackagesCollaction.find().toArray();
+      res.send(result);
+  })
+  // all packages data by id 
+  app.get("/alltourdetail/:id", async (req, res) => {
+    const id = req.params.id;
+    // console.log(id);
+    const query = await { _id: new ObjectId(id) };
+    const result = await ourPackagesCollaction.findOne(query);
+    res.send(result);
+    // console.log(result);
+  });
 
   } finally {
     
