@@ -28,9 +28,15 @@ async function run() {
 
     const database = client.db('lifeOn');
     const videosCollaction = database.collection('videos');
-
+    const packagesCollaction = database.collection('packages');
+    // videos api
     app.get('/videos',async(req,res)=>{
         const result= await videosCollaction.find().toArray();
+        res.send(result);
+    })
+    // packages apis
+    app.get("/packages",async(req,res)=>{
+        const result=await packagesCollaction.find().toArray();
         res.send(result);
     })
 
