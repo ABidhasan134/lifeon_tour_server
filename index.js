@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.get('/', (req, res) => res.send('Life is on my way'))
 
-console.log(process.env.DB_PASSWORD);
+console.log("here is user and password",process.env.DB_PASSWORD,process.env.DB_USER);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.il352b3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -60,7 +60,15 @@ async function run() {
     const result=await ourGuidesCollaction.find().toArray();
     res.send(result);
 })
-
+// find a guide data
+app.get("/guideDetails/:id", async (req, res) => {
+  const id = req.params.id;
+  // console.log(id);
+  const query = { _id: new ObjectId(id) };
+  const result = await ourGuidesCollaction.findOne(query);
+  res.send(result);
+  // console.log(result);
+});
 
   } finally {
     
