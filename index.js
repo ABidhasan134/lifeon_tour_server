@@ -30,6 +30,7 @@ async function run() {
     const videosCollaction = database.collection('videos');
     const packagesCollaction = database.collection('packages');
     const ourPackagesCollaction = database.collection('ourPackages');
+    const ourGuidesCollaction = database.collection('guide');
     // videos api
     app.get('/videos',async(req,res)=>{
         const result= await videosCollaction.find().toArray();
@@ -49,11 +50,17 @@ async function run() {
   app.get("/alltourdetail/:id", async (req, res) => {
     const id = req.params.id;
     // console.log(id);
-    const query = await { _id: new ObjectId(id) };
+    const query = { _id: new ObjectId(id) };
     const result = await ourPackagesCollaction.findOne(query);
     res.send(result);
     // console.log(result);
   });
+  // guided person get api
+  app.get("/guides",async(req,res)=>{
+    const result=await ourGuidesCollaction.find().toArray();
+    res.send(result);
+})
+
 
   } finally {
     
