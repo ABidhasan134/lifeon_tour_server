@@ -44,6 +44,7 @@ async function run() {
     const storysCollaction = database.collection("story");
     const bookingsCollaction = database.collection("bookings");
     const rattingCommentCollaction = database.collection("rattingComment");
+    const wishlistCollaction = database.collection("wishlist");
     // videos api
     app.get("/videos", async (req, res) => {
       const result = await videosCollaction.find().toArray();
@@ -121,9 +122,16 @@ async function run() {
     
         const result = await rattingCommentCollaction.updateOne(filter, updateDoc, options);
         res.send(result);
-     console.log(updateDoc)
+    //  console.log(updateDoc)
     });
     // wishList
+    app.post("/wishlist",async(req, res) =>{
+      const wish=req.body;
+      const result=await wishlistCollaction.insertOne(wish);
+      res.status({massage: "All ready have"}).send(result);
+      // console.log(wish); 
+
+    })
   } finally {
   }
 }
