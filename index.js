@@ -31,6 +31,7 @@ async function run() {
     const packagesCollaction = database.collection('packages');
     const ourPackagesCollaction = database.collection('ourPackages');
     const ourGuidesCollaction = database.collection('guide');
+    const storysCollaction = database.collection('story');
     // videos api
     app.get('/videos',async(req,res)=>{
         const result= await videosCollaction.find().toArray();
@@ -69,6 +70,11 @@ app.get("/guideDetails/:id", async (req, res) => {
   res.send(result);
   // console.log(result);
 });
+// story get api
+app.get("/storys",async(req,res)=>{
+  const result=await storysCollaction.find().toArray();
+  res.send(result);
+})
 
   } finally {
     
