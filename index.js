@@ -46,15 +46,34 @@ async function run() {
     const bookingsCollaction = database.collection("bookings");
     const rattingCommentCollaction = database.collection("rattingComment");
     const wishlistCollaction = database.collection("wishlist");
+    const userstCollaction = database.collection("users");
     // jwt related apis
     // create token 
-    app.post('jwt',async(req,res)=>{
+    app.post('/jwt',async(req,res)=>{
       const userEamil=req.body;
       const token=jwt.sign(userEamil,process.env.ACCESS_TOKEN,{ expiresIn: '1h' })
       res.send(token);
     })
+    const verifyToken=async(req, res,next)=>{
+      const authHeader = req.headers.authorization || req.headers.Authorization;
+      console.log(authHeader)
+      if (!authHeader) {
+        return res.status(401).send({ message: "Forbidden access" });
+      }
+      const token = authHeader.split(' ')[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        console.log(process.env.ACCESS_TOKEN)
+        console.log(token)
+        if (err) {
+          return res.status(401).send({ message: "Forbidden access" });
+        }
+        req.decoded = decoded;
+        
+        next();
+      });
+    }
     // videos api
-    app.get("/videos", async (req, res) => {
+    app.get("/videos",async (req, res) => {
       const result = await videosCollaction.find().toArray();
       res.send(result);
     });
@@ -104,7 +123,7 @@ async function run() {
       // console.log(info)
     })
     // ratting and commenting
-    app.put('/rattingComment/:email', async (req, res) => {
+    app.put('/rattingComment/:email',verifyToken, async (req, res) => {
       const filter = {tourist_email: req.params.email };  // Assuming email is the filter criteria
       const info = req.body;
       // console.log(filter);
@@ -136,11 +155,27 @@ async function run() {
     app.post("/wishlist",async(req, res) =>{
       const wish=req.body;
       delete wish._id;
-      console.log("wish consol",wish); 
+      // console.log("wish consol",wish); 
       const result=await wishlistCollaction.insertOne(wish);
       res.send(result);
 
     })
+    // user
+    app.put("/users/:useremail", async (req, res) => {
+      const userInfo = req.body;
+      const filter = { user_email: req.params.useremail };
+      const updateUser = {
+        $set: {
+          user_name: userInfo.user_name,
+          user_email: userInfo.user_email,
+          role: userInfo.role,
+        },
+      };
+      const options = { upsert: true };
+      const result = await userstCollaction.updateOne(filter, updateUser, options);
+      res.send(result);
+    });
+    
   } finally {
   }
 }
