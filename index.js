@@ -127,9 +127,10 @@ async function run() {
     // wishList
     app.post("/wishlist",async(req, res) =>{
       const wish=req.body;
+      delete wish._id;
+      console.log("wish consol",wish); 
       const result=await wishlistCollaction.insertOne(wish);
-      res.status({massage: "All ready have"}).send(result);
-      // console.log(wish); 
+      res.send(result);
 
     })
   } finally {
