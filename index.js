@@ -177,6 +177,20 @@ async function run() {
       res.send(result);
 
     })
+    app.get('/wishlist/:email',async(req, res) =>{
+      const email=req.params.email;
+      // console.log("wish consol",email);
+      const query={user_email: email}
+      const result= await wishlistCollaction.find(query).toArray();
+      res.send(result);
+    })
+    app.delete('/wishlist/:id',async(req, res) =>{
+      const id=req.params.id;
+      // console.log(id)
+      const query={_id:new ObjectId(id)}
+      const result=await wishlistCollaction.deleteOne(query);
+      res.send(result);
+    })
     // users apis
     app.put("/users/:useremail", async (req, res) => {
       const userInfo = req.body;
