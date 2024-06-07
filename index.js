@@ -132,6 +132,13 @@ async function run() {
       const result=await bookingsCollaction.find(filter).toArray();
       res.send(result);
     })
+    app.delete("/mybooking/:id", async (req, res) =>{
+      const id=req.params.id;
+      // console.log(id)
+      const query={_id:new ObjectId(id)}
+      const result=await bookingsCollaction.deleteOne(query);
+      res.send(result);
+    })
     // ratting and commenting
     app.put('/rattingComment/:email',verifyToken, async (req, res) => {
       const filter = {tourist_email: req.params.email };  // Assuming email is the filter criteria
