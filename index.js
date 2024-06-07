@@ -115,6 +115,11 @@ async function run() {
       const result = await storysCollaction.find().toArray();
       res.send(result);
     });
+    app.post("/storys",async(req,res)=>{
+      const newStory=req.body;
+      const result=await storysCollaction.insertOne(newStory)
+      res.send(result);
+    })
     // mybookings
     app.post('/mybooking',async(req,res)=>{
       const info=req.body;
@@ -160,7 +165,7 @@ async function run() {
       res.send(result);
 
     })
-    // user
+    // users apis
     app.put("/users/:useremail", async (req, res) => {
       const userInfo = req.body;
       const filter = { user_email: req.params.useremail };
@@ -175,6 +180,10 @@ async function run() {
       const result = await userstCollaction.updateOne(filter, updateUser, options);
       res.send(result);
     });
+
+    app.get("/user/:email",async(req,res)=>{
+      
+    })
     
   } finally {
   }
