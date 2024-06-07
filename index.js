@@ -9,8 +9,8 @@ const port = process.env.PORT || 5000;
 //middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173", // Your frontend URL
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: "http://localhost:5173", 
+    credentials: true, 
   })
 );
 app.use(express.json());
@@ -101,6 +101,30 @@ async function run() {
       const result = await ourGuidesCollaction.find().toArray();
       res.send(result);
     });
+    app.put("/guides/:email", async (req, res) => {
+      const filter={email: req.params.email}
+      const info=req.body
+      const updateDoc={
+        $set:{
+          name:info.name,
+          experience:info.experience,
+          availability:info.availability,
+          price_range:info.price_range,
+          bio:info.bio,
+          image_url:info.image_url,
+          specialties:info.specialties,
+          languages:info.languages,
+          city:info.city,
+          average_rating:info.average_rating,
+          status:info.status
+        }
+      }
+      // console.log(updateDoc);
+      const options = { upsert: true };
+      const result = await ourGuidesCollaction.updateOne(filter, updateDoc, options);
+        res.send(result);
+
+    })
     // find a guide data
     app.get("/guideDetails/:id", async (req, res) => {
       const id = req.params.id;
