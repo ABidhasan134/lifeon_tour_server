@@ -127,6 +127,11 @@ async function run() {
       res.send(result);
       // console.log(info)
     })
+    app.get("/mybooking/:email", async (req, res) => {
+      const filter={tourist_email:req.params.email}
+      const result=await bookingsCollaction.find(filter).toArray();
+      res.send(result);
+    })
     // ratting and commenting
     app.put('/rattingComment/:email',verifyToken, async (req, res) => {
       const filter = {tourist_email: req.params.email };  // Assuming email is the filter criteria
