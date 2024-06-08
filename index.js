@@ -17,11 +17,11 @@ app.use(express.json());
 
 app.get("/", (req, res) => res.send("Life is on my way"));
 
-console.log(
-  "here is user and password",
-  process.env.DB_PASSWORD,
-  process.env.DB_USER
-);
+// console.log(
+//   "here is user and password",
+//   process.env.DB_PASSWORD,
+//   process.env.DB_USER
+// );
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.il352b3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -145,6 +145,11 @@ async function run() {
     // console.log("Query Result:", result);
     res.send(result);
 });
+    app.get("/guidetoure/:email", async (req, res) => {
+      const filter={guide_email:req.params.email}
+      const result=await bookingsCollaction.find(filter).toArray();
+      res.send(result);
+    })
 
     // story get api
     app.get("/storys", async (req, res) => {
@@ -168,12 +173,26 @@ async function run() {
       const result=await bookingsCollaction.find(filter).toArray();
       res.send(result);
     })
+    
     app.delete("/mybooking/:id", async (req, res) =>{
       const id=req.params.id;
       // console.log(id)
       const query={_id:new ObjectId(id)}
       const result=await bookingsCollaction.deleteOne(query);
       res.send(result);
+    })
+    app.patch("/mybooking/:id", async (req, res)=>{
+      const id=req.params.id;
+      const info=req.body.status;
+      const filter={_id:new ObjectId(id)}
+      const updatDoc={
+        $set:{
+          status:info
+        }
+      }
+      // console.log(id,info)
+      const result=await bookingsCollaction.updateOne(filter,updatDoc)
+      res.send(result)
     })
     // ratting and commenting
     app.put('/rattingComment/:email',verifyToken, async (req, res) => {
@@ -275,7 +294,7 @@ async function run() {
       }
       const query = { email: email };
       const user = await ourGuidesCollaction.findOne(query);
-      console.log(query,user);
+      // console.log(query,user);
       let guide = false; // Default to false if user or role is not found
       if (user && user.role==="guide") {
         guide = true;
