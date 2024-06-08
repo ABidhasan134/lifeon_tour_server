@@ -233,7 +233,31 @@ async function run() {
       const result = await userstCollaction.updateOne(filter, updateUser, options);
       res.send(result);
     });
-    
+    //middlewares of admin
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await ourGuidesCollaction.findOne(query);
+      const isAdmin = user?.role === "admin";
+      if (!isAdmin) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+      next();
+    };
+    // admin apis
+    app.get("/users/admin/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "unauthorized access" });
+      }
+      const query = { email: email };
+      const user = await ourGuidesCollaction.findOne(query);
+      let admin = false; // Default to false if user or role is not found
+      if (user && user.role === "admin") {
+        admin = true;
+      }
+      res.send({ admin });
+    });
     
   } finally {
   }
