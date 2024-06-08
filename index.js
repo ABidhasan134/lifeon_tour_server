@@ -96,9 +96,10 @@ async function run() {
       res.send(result);
       // console.log(result);
     });
-    // guided person get api
+    // guided person get api  // find a guide data (this is user collaction also)
     app.get("/guides", async (req, res) => {
-      const result = await ourGuidesCollaction.find().toArray();
+     const filte={role:'guide',status:'ok'}
+      const result = await ourGuidesCollaction.find(filte).toArray();
       res.send(result);
     });
     app.put("/guides/:email", async (req, res) => {
@@ -106,26 +107,28 @@ async function run() {
       const info=req.body
       const updateDoc={
         $set:{
-          name:info.name,
-          experience:info.experience,
-          availability:info.availability,
-          price_range:info.price_range,
-          bio:info.bio,
-          image_url:info.image_url,
-          specialties:info.specialties,
-          languages:info.languages,
-          city:info.city,
-          average_rating:info.average_rating,
-          status:info.status
+          name:info?.name || info.user_name,
+          email: info?.email || info.user_email,
+          experience:info?.experience,
+          availability:info?.availability,
+          price_range:info?.price_range,
+          bio:info?.bio,
+          image_url:info?.image_url,
+          specialties:info?.specialties,
+          languages:info?.languages,
+          city:info?.city,
+          average_rating:info?.average_rating,
+          status:info?.status,
+          role: info?.role || 'guide'
         }
       }
       // console.log(updateDoc);
       const options = { upsert: true };
+     
       const result = await ourGuidesCollaction.updateOne(filter, updateDoc, options);
         res.send(result);
 
     })
-    // find a guide data
     app.get("/guideDetails/:id", async (req, res) => {
       const id = req.params.id;
       // console.log(id);
@@ -230,10 +233,7 @@ async function run() {
       const result = await userstCollaction.updateOne(filter, updateUser, options);
       res.send(result);
     });
-
-    app.get("/user/:email",async(req,res)=>{
-      
-    })
+    
     
   } finally {
   }
