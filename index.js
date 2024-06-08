@@ -138,9 +138,9 @@ async function run() {
       // console.log(result);
     });
 
-    app.get("/guidesSingel/:email", async (req, res) => {
-    const filter = {role: 'guide', status: 'ok', email: req.params.email};
-    // console.log("Query Filter:", filter);
+    app.get("/admindetails/:email", async (req, res) => {
+    const filter = {role: 'admin', email: req.params.email};
+    console.log("Query Filter:", filter);
     const result = await ourGuidesCollaction.find(filter).toArray();
     // console.log("Query Result:", result);
     res.send(result);
