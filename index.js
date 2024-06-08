@@ -56,14 +56,14 @@ async function run() {
     })
     const verifyToken=async(req, res,next)=>{
       const authHeader = req.headers.authorization || req.headers.Authorization;
-      console.log(authHeader)
+      // console.log(authHeader)
       if (!authHeader) {
         return res.status(401).send({ message: "Forbidden access" });
       }
       const token = authHeader.split(' ')[1];
       jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
-        console.log(process.env.ACCESS_TOKEN)
-        console.log(token)
+        // console.log(process.env.ACCESS_TOKEN)
+        // console.log(token)
         if (err) {
           return res.status(401).send({ message: "Forbidden access" });
         }
@@ -137,6 +137,15 @@ async function run() {
       res.send(result);
       // console.log(result);
     });
+
+    app.get("/guidesSingel/:email", async (req, res) => {
+    const filter = {role: 'guide', status: 'ok', email: req.params.email};
+    // console.log("Query Filter:", filter);
+    const result = await ourGuidesCollaction.find(filter).toArray();
+    // console.log("Query Result:", result);
+    res.send(result);
+});
+
     // story get api
     app.get("/storys", async (req, res) => {
       const result = await storysCollaction.find().toArray();
@@ -257,6 +266,21 @@ async function run() {
         admin = true;
       }
       res.send({ admin });
+    });
+    // guide apis
+    app.get("/users/guide/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "unauthorized access" });
+      }
+      const query = { email: email };
+      const user = await ourGuidesCollaction.findOne(query);
+      console.log(query,user);
+      let guide = false; // Default to false if user or role is not found
+      if (user && user.role==="guide") {
+        guide = true;
+      }
+      res.send({ guide });
     });
     
   } finally {
