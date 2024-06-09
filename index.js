@@ -72,6 +72,27 @@ async function run() {
         next();
       });
     }
+    const verifyguide = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await ourGuidesCollaction.findOne(query);
+      const isGuide = user?.role === "guide";
+      if (!isGuide) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+      next();
+    };
+     //middlewares of admin
+     const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await ourGuidesCollaction.findOne(query);
+      const isAdmin = user?.role === "admin";
+      if (!isAdmin) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+      next();
+    };
     // videos api
     app.get("/videos",async (req, res) => {
       const result = await videosCollaction.find().toArray();
@@ -176,16 +197,13 @@ async function run() {
       const result=await bookingsCollaction.find(filter).toArray();
       res.send(result);
     })
-
-    app.get('/searchUsers', async (req, res) => {
-      const searchQuery = req.query.name;
-      const query = {
-        name: { $regex: searchQuery, $options: "i" },
-      };
-      const result = await ourGuidesCollaction.find(query).toArray();
-      res.send(result);
-    });
     
+    app.get('/guidesSingel/:email',async (req, res) => {
+      const email=req.params.email;
+      const filter={email: email}
+      const result=await ourGuidesCollaction.findOne(filter);
+      res.send(result)
+    })
     // story get api
     app.get("/storys", async (req, res) => {
       const result = await storysCollaction.find().toArray();
@@ -296,19 +314,9 @@ async function run() {
       const result = await userstCollaction.updateOne(filter, updateUser, options);
       res.send(result);
     });
-    //middlewares of admin
-    const verifyAdmin = async (req, res, next) => {
-      const email = req.decoded.email;
-      const query = { email: email };
-      const user = await ourGuidesCollaction.findOne(query);
-      const isAdmin = user?.role === "admin";
-      if (!isAdmin) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
-      next();
-    };
+   
     // admin apis
-    app.get("/users/admin/:email", verifyToken, async (req, res) => {
+    app.get("/users/admin/:email", verifyToken,verifyAdmin, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
         return res.status(403).send({ message: "unauthorized access" });
@@ -321,8 +329,20 @@ async function run() {
       }
       res.send({ admin });
     });
+    app.get('/searchUsers',verifyToken,verifyAdmin, async (req, res) => {
+      const searchQuery = req.query.name || '';
+      const role = req.query.role || '';
+    
+      const query = {
+        name: { $regex: searchQuery, $options: "i" },
+        ...(role && { role: role }), // Adding role to query if it's provided
+      };
+    
+      const result = await ourGuidesCollaction.find(query).toArray();
+      res.send(result);
+    });
     // guide apis
-    app.get("/users/guide/:email", verifyToken, async (req, res) => {
+    app.get("/users/guide/:email", verifyToken,verifyguide, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
         return res.status(403).send({ message: "unauthorized access" });
@@ -336,6 +356,7 @@ async function run() {
       }
       res.send({ guide });
     });
+    
     
   } finally {
   }
