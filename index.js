@@ -87,6 +87,13 @@ async function run() {
       const result = await ourPackagesCollaction.find().toArray();
       res.send(result);
     });
+    app.post('/ourPackages',async(req,res)=>{
+      const info=req.body;
+      // console.log(info)
+      const result=await ourPackagesCollaction.insertOne(info)
+      res.send(result)
+      // console.log(info);
+    })
     // all packages data by id
     app.get("/alltourdetail/:id", async (req, res) => {
       const id = req.params.id;
@@ -140,7 +147,7 @@ async function run() {
 
     app.get("/admindetails/:email", async (req, res) => {
     const filter = {role: 'admin', email: req.params.email};
-    console.log("Query Filter:", filter);
+    // console.log("Query Filter:", filter);
     const result = await ourGuidesCollaction.find(filter).toArray();
     // console.log("Query Result:", result);
     res.send(result);
