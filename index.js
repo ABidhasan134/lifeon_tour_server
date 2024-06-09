@@ -144,6 +144,25 @@ async function run() {
       res.send(result);
       // console.log(result);
     });
+    app.get("/allUser", async (req, res) =>{
+      const result = await ourGuidesCollaction.find().toArray();
+      res.send(result);
+    })
+    app.patch("/alluser/:id",async(req, res) =>{
+      const id=req.params.id;
+      const info=req.body;
+      const filter={_id: new ObjectId(id)}
+      // console.log(info,filter);
+      const updatDoc={
+        $set:{
+          role:info.role,
+          status:info.status
+        }
+      }
+      // console.log(updatDoc)
+      const result=await ourGuidesCollaction.updateOne(filter,updatDoc)
+      res.send(result)
+    })
 
     app.get("/admindetails/:email", async (req, res) => {
     const filter = {role: 'admin', email: req.params.email};
@@ -158,6 +177,15 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/searchUsers', async (req, res) => {
+      const searchQuery = req.query.name;
+      const query = {
+        name: { $regex: searchQuery, $options: "i" },
+      };
+      const result = await ourGuidesCollaction.find(query).toArray();
+      res.send(result);
+    });
+    
     // story get api
     app.get("/storys", async (req, res) => {
       const result = await storysCollaction.find().toArray();
