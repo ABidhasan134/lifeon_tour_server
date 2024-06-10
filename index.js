@@ -116,7 +116,7 @@ async function run() {
       // console.log(info);
     })
     // all packages data by id
-    app.get("/alltourdetail/:id", async (req, res) => {
+    app.get("/alltourdetail/:id",verifyToken, async (req, res) => {
       const id = req.params.id;
       // console.log(id);
       const query = { _id: new ObjectId(id) };
@@ -125,12 +125,12 @@ async function run() {
       // console.log(result);
     });
     // guided person get api  // find a guide data (this is user collaction also)
-    app.get("/guides", async (req, res) => {
+    app.get("/guides",verifyToken,verifyAdmin, async (req, res) => {
      const filte={role:'guide',status:'ok'}
       const result = await ourGuidesCollaction.find(filte).toArray();
       res.send(result);
     });
-    app.put("/guides/:email", async (req, res) => {
+    app.put("/guides/:email",verifyToken, async (req, res) => {
       const filter={email: req.params.email}
       const info=req.body
       const updateDoc={
@@ -157,7 +157,7 @@ async function run() {
         res.send(result);
 
     })
-    app.get("/guideDetails/:id", async (req, res) => {
+    app.get("/guideDetails/:id",verifyToken, async (req, res) => {
       const id = req.params.id;
       // console.log(id);
       const query = { _id: new ObjectId(id) };
@@ -165,11 +165,11 @@ async function run() {
       res.send(result);
       // console.log(result);
     });
-    app.get("/allUser", async (req, res) =>{
+    app.get("/allUser",verifyToken,verifyAdmin, async (req, res) =>{
       const result = await ourGuidesCollaction.find().toArray();
       res.send(result);
     })
-    app.patch("/alluser/:id",async(req, res) =>{
+    app.patch("/alluser/:id",verifyToken,verifyAdmin,async(req, res) =>{
       const id=req.params.id;
       const info=req.body;
       const filter={_id: new ObjectId(id)}
@@ -185,20 +185,20 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/admindetails/:email", async (req, res) => {
+    app.get("/admindetails/:email",verifyToken,verifyAdmin, async (req, res) => {
     const filter = {role: 'admin', email: req.params.email};
     // console.log("Query Filter:", filter);
     const result = await ourGuidesCollaction.find(filter).toArray();
     // console.log("Query Result:", result);
     res.send(result);
 });
-    app.get("/guidetoure/:email", async (req, res) => {
+    app.get("/guidetoure/:email",verifyToken,verifyguide, async (req, res) => {
       const filter={guide_email:req.params.email}
       const result=await bookingsCollaction.find(filter).toArray();
       res.send(result);
     })
     
-    app.get('/guidesSingel/:email',async (req, res) => {
+    app.get('/guidesSingel/:email',verifyToken,verifyguide,async (req, res) => {
       const email=req.params.email;
       const filter={email: email}
       const result=await ourGuidesCollaction.findOne(filter);
@@ -209,32 +209,32 @@ async function run() {
       const result = await storysCollaction.find().toArray();
       res.send(result);
     });
-    app.post("/storys",async(req,res)=>{
+    app.post("/storys",verifyToken,async(req,res)=>{
       const newStory=req.body;
       const result=await storysCollaction.insertOne(newStory)
       res.send(result);
     })
     // mybookings
-    app.post('/mybooking',async(req,res)=>{
+    app.post('/mybooking',verifyToken,async(req,res)=>{
       const info=req.body;
       const result=await bookingsCollaction.insertOne(info);
       res.send(result);
       // console.log(info)
     })
-    app.get("/mybooking/:email", async (req, res) => {
+    app.get("/mybooking/:email",verifyToken, async (req, res) => {
       const filter={tourist_email:req.params.email}
       const result=await bookingsCollaction.find(filter).toArray();
       res.send(result);
     })
     
-    app.delete("/mybooking/:id", async (req, res) =>{
+    app.delete("/mybooking/:id",verifyToken, async (req, res) =>{
       const id=req.params.id;
       // console.log(id)
       const query={_id:new ObjectId(id)}
       const result=await bookingsCollaction.deleteOne(query);
       res.send(result);
     })
-    app.patch("/mybooking/:id", async (req, res)=>{
+    app.patch("/mybooking/:id",verifyToken, async (req, res)=>{
       const id=req.params.id;
       const info=req.body.status;
       const filter={_id:new ObjectId(id)}
@@ -277,7 +277,7 @@ async function run() {
     //  console.log(updateDoc)
     });
     // wishList
-    app.post("/wishlist",async(req, res) =>{
+    app.post("/wishlist",verifyToken, async(req, res) =>{
       const wish=req.body;
       delete wish._id;
       // console.log("wish consol",wish); 
@@ -285,14 +285,14 @@ async function run() {
       res.send(result);
 
     })
-    app.get('/wishlist/:email',async(req, res) =>{
+    app.get('/wishlist/:email',verifyToken,async(req, res) =>{
       const email=req.params.email;
       // console.log("wish consol",email);
       const query={user_email: email}
       const result= await wishlistCollaction.find(query).toArray();
       res.send(result);
     })
-    app.delete('/wishlist/:id',async(req, res) =>{
+    app.delete('/wishlist/:id',verifyToken,async(req, res) =>{
       const id=req.params.id;
       // console.log(id)
       const query={_id:new ObjectId(id)}
@@ -300,7 +300,7 @@ async function run() {
       res.send(result);
     })
     // users apis
-    app.put("/users/:useremail", async (req, res) => {
+    app.put("/users/:useremail",verifyToken, async (req, res) => {
       const userInfo = req.body;
       const filter = { user_email: req.params.useremail };
       const updateUser = {
