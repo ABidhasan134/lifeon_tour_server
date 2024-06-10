@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 //middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: ["http://localhost:5173","https://life-on-tour.web.app","https://life-on-tour.firebaseapp.com/"], 
     credentials: true, 
   })
 );
@@ -32,10 +32,10 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.connect();
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
 
     const database = client.db("lifeOn");
     const videosCollaction = database.collection("videos");
